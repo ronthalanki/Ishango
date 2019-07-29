@@ -2,6 +2,8 @@ package ishango;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import ishango.models.Candidate;
+import ishango.models.User;
+import ishango.models.Vote;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -46,6 +48,30 @@ public class DbClient {
     return candidates;
   }
 
+  private List<User> listUsers() throws SQLException {
+    final String query = "SELECT * FROM Users;";
+    final ResultSet resultSet = getResultSet(query);
+
+    final List<User> users = new ArrayList<>();
+    while (resultSet.next()) {
+      users.add(new User(resultSet.getInt(1), resultSet.getString(2)));
+    }
+    return users;
+  }
+
+  private List<Vote> listVotes() throws SQLException {
+    final String query = "SELECT * FROM Votes;";
+    final ResultSet resultSet = getResultSet(query);
+
+    final List<Vote> votes = new ArrayList<>();
+    while (resultSet.next()) {
+      votes.add(
+          new Vote(
+              resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4)));
+    }
+    return votes;
+  }
+
   private ResultSet getResultSet(final String query) throws SQLException {
     PreparedStatement pst = connection.prepareStatement(query);
     pst.execute();
@@ -70,7 +96,6 @@ public class DbClient {
 
   public static void main(String[] args) throws IOException, SQLException {
     DbClient client = new DbClient();
-    // client.executeMultipleQueries("SELECT * FROM Candidates;");
     System.out.println(client.listCandidates());
   }
 }
