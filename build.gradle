@@ -1,0 +1,53 @@
+plugins {
+    id 'application'
+    id 'checkstyle'
+    id 'java'
+    id 'com.diffplug.gradle.spotless' version '3.22.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'mysql:mysql-connector-java:5.1.45'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:3.12.2'
+}
+
+task testUnit(type: Test) {
+    useJUnit {
+        includeCategories 'ishango.UnitTests'
+    }
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+        removeUnusedImports()
+    }
+}
+
+def reportsDir = "${buildDir}/reports/checkstyle";
+
+checkstyle {
+    toolVersion = '8.12'
+    configFile = rootProject.file('checkstyle.xml')
+}
+
+task checkstyle(type: Checkstyle) {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+        html.destination = file("${reportsDir}/checkstyle")
+    }
+}
+
+checkstyleMain {
+    source = 'src/main/java'
+}
+
+checkstyleTest {
+    source = 'src/test/java'
+}
