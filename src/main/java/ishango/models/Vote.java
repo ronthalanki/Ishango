@@ -2,14 +2,14 @@ package ishango.models;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class Vote {
-  private final Integer id;
-  private final Integer userId;
-  private final Integer candidateId;
-  private final Integer rank;
+  @Getter private final Integer userId;
+  @Getter private final Integer candidateId;
+  @Getter private final Integer rank;
 }

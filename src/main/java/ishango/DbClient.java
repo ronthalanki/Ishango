@@ -37,37 +37,57 @@ public class DbClient {
     return ds;
   }
 
-  private List<Candidate> listCandidates() throws SQLException {
+  public Candidate getCandidateById(final Integer id) throws SQLException {
+    final String query = String.format("SELECT * FROM Candidates WHERE Id = %s;", id);
+    final ResultSet resultSet = getResultSet(query);
+
+    if (resultSet.next()) {
+      return candidateFromResultSet(resultSet);
+    }
+    return null;
+  }
+
+  public List<Vote> getVotesByUser(final Integer userId) throws SQLException {
+    final String query =
+        String.format("SELECT UserId, CandidateId, Rank FROM Votes WHERE UserId = %s;", userId);
+    final ResultSet resultSet = getResultSet(query);
+
+    final List<Vote> votes = new ArrayList<>();
+    while (resultSet.next()) {
+      votes.add(voteFromResultSet(resultSet));
+    }
+    return votes;
+  }
+
+  public List<Candidate> listCandidates() throws SQLException {
     final String query = "SELECT * FROM Candidates;";
     final ResultSet resultSet = getResultSet(query);
 
     final List<Candidate> candidates = new ArrayList<>();
     while (resultSet.next()) {
-      candidates.add(new Candidate(resultSet.getInt(1), resultSet.getString(2)));
+      candidates.add(candidateFromResultSet(resultSet));
     }
     return candidates;
   }
 
-  private List<User> listUsers() throws SQLException {
+  public List<User> listUsers() throws SQLException {
     final String query = "SELECT * FROM Users;";
     final ResultSet resultSet = getResultSet(query);
 
     final List<User> users = new ArrayList<>();
     while (resultSet.next()) {
-      users.add(new User(resultSet.getInt(1), resultSet.getString(2)));
+      users.add(userFromResultSet(resultSet));
     }
     return users;
   }
 
-  private List<Vote> listVotes() throws SQLException {
+  public List<Vote> listVotes() throws SQLException {
     final String query = "SELECT * FROM Votes;";
     final ResultSet resultSet = getResultSet(query);
 
     final List<Vote> votes = new ArrayList<>();
     while (resultSet.next()) {
-      votes.add(
-          new Vote(
-              resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3), resultSet.getInt(4)));
+      votes.add(voteFromResultSet(resultSet));
     }
     return votes;
   }
@@ -76,6 +96,21 @@ public class DbClient {
     PreparedStatement pst = connection.prepareStatement(query);
     pst.execute();
     return pst.getResultSet();
+  }
+
+  private Candidate candidateFromResultSet(final ResultSet resultSet) throws SQLException {
+    final Candidate candidate = new Candidate(resultSet.getInt(1), resultSet.getString(2));
+    return candidate;
+  }
+
+  private User userFromResultSet(final ResultSet resultSet) throws SQLException {
+    final User user = new User(resultSet.getInt(1), resultSet.getString(2));
+    return user;
+  }
+
+  private Vote voteFromResultSet(final ResultSet resultSet) throws SQLException {
+    final Vote vote = new Vote(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3));
+    return vote;
   }
 
   private void executeMultipleQueries(final String query) throws SQLException {
@@ -92,10 +127,5 @@ public class DbClient {
 
       isResult = pst.getMoreResults();
     }
-  }
-
-  public static void main(String[] args) throws IOException, SQLException {
-    DbClient client = new DbClient();
-    System.out.println(client.listCandidates());
   }
 }

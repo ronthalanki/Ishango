@@ -2,12 +2,13 @@ package ishango.models;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class Candidate {
-  private final Integer id;
-  private final String name;
+  @Getter private final Integer id;
+  @Getter private final String name;
 }
