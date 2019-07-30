@@ -20,11 +20,11 @@ public class DbClient {
   final Connection connection;
 
   public DbClient() throws IOException, SQLException {
-    datasource = getMySQLDataSource();
+    datasource = getMySqlDataSource();
     connection = datasource.getConnection();
   }
 
-  private MysqlDataSource getMySQLDataSource() throws IOException {
+  private MysqlDataSource getMySqlDataSource() throws IOException {
     final Properties properties = new Properties();
     final FileInputStream fileInputStream = new FileInputStream(MYSQL_PROPERTIES);
     properties.load(fileInputStream);
