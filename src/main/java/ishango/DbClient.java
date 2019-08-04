@@ -16,8 +16,8 @@ import java.util.Properties;
 
 public class DbClient {
   private static final String MYSQL_PROPERTIES = "src/main/resources/db.properties";
-  final MysqlDataSource datasource;
-  final Connection connection;
+  private final MysqlDataSource datasource;
+  private final Connection connection;
 
   public DbClient() throws IOException, SQLException {
     datasource = getMySqlDataSource();
@@ -47,18 +47,6 @@ public class DbClient {
     return null;
   }
 
-  public List<Vote> getVotesByUser(final Integer userId) throws SQLException {
-    final String query =
-        String.format("SELECT UserId, ChoiceId, Rank FROM Votes WHERE UserId = %s;", userId);
-    final ResultSet resultSet = getResultSet(query);
-
-    final List<Vote> votes = new ArrayList<>();
-    while (resultSet.next()) {
-      votes.add(voteFromResultSet(resultSet));
-    }
-    return votes;
-  }
-
   public List<Choice> listChoices() throws SQLException {
     final String query = "SELECT * FROM Choices;";
     final ResultSet resultSet = getResultSet(query);
@@ -81,6 +69,18 @@ public class DbClient {
     return users;
   }
 
+  public List<Vote> getVotesByUser(final Integer userId) throws SQLException {
+    final String query =
+        String.format("SELECT UserId, ChoiceId, Rank FROM Votes WHERE UserId = %s;", userId);
+    final ResultSet resultSet = getResultSet(query);
+
+    final List<Vote> votes = new ArrayList<>();
+    while (resultSet.next()) {
+      votes.add(voteFromResultSet(resultSet));
+    }
+    return votes;
+  }
+
   public List<Vote> listVotes() throws SQLException {
     final String query = "SELECT * FROM Votes;";
     final ResultSet resultSet = getResultSet(query);
@@ -93,7 +93,7 @@ public class DbClient {
   }
 
   private ResultSet getResultSet(final String query) throws SQLException {
-    PreparedStatement pst = connection.prepareStatement(query);
+    final PreparedStatement pst = connection.prepareStatement(query);
     pst.execute();
     return pst.getResultSet();
   }

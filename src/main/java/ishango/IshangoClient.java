@@ -1,17 +1,18 @@
 package ishango;
 
+import ishango.models.Ballot;
 import ishango.models.Choice;
 import ishango.models.User;
-import ishango.models.UserVotes;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class IshangoClient {
-  private DbClient dbClient;
+  private final DbClient dbClient;
 
   public IshangoClient() throws IOException, SQLException {
     this.dbClient = new DbClient();
@@ -19,32 +20,36 @@ public class IshangoClient {
 
   public Choice calculateWinner() throws SQLException {
     final List<User> users = dbClient.listUsers();
-
-    final List<UserVotes> userVotes = new ArrayList<>();
-    for (User user : users) {
-      userVotes.add(new UserVotes(dbClient.getVotesByUser(user.getId())));
-    }
-
     final List<Choice> choices = dbClient.listChoices();
-    final Map<Integer, Integer> numVotes = new HashMap<>();
 
+    final List<Ballot> ballots = getBallots(users);
+    final Map<Integer, Integer> votesPerChoice = getVotesPerChoice(choices, ballots);
+
+    final Integer key =
+        Collections.max(votesPerChoice.entrySet(), Map.Entry.comparingByValue()).getKey();
+    return dbClient.getChoiceById(key);
+  }
+
+  private List<Ballot> getBallots(final List<User> users) throws SQLException {
+    final List<Ballot> ballots = new ArrayList<>();
+    for (User user : users) {
+      ballots.add(new Ballot(dbClient.getVotesByUser(user.getId())));
+    }
+    return ballots;
+  }
+
+  private Map<Integer, Integer> getVotesPerChoice(
+      final List<Choice> choices, final List<Ballot> ballots) {
+    final Map<Integer, Integer> votesPerChoice = new HashMap<>();
     for (Choice choice : choices) {
-      numVotes.put(choice.getId(), 0);
+      votesPerChoice.put(choice.getId(), 0);
     }
 
-    for (UserVotes uv : userVotes) {
-      numVotes.put(uv.getCandidateOrder().get(0), numVotes.get(uv.getCandidateOrder().get(0)) + 1);
+    for (Ballot ballot : ballots) {
+      votesPerChoice.put(
+          ballot.getBallot().get(0), votesPerChoice.get(ballot.getBallot().get(0)) + 1);
     }
-
-    Map.Entry<Integer, Integer> maxEntry = null;
-
-    for (Map.Entry<Integer, Integer> entry : numVotes.entrySet()) {
-      if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
-        maxEntry = entry;
-      }
-    }
-
-    return dbClient.getChoiceById(maxEntry.getKey());
+    return votesPerChoice;
   }
 
   public static void main(String[] args) throws IOException, SQLException {
