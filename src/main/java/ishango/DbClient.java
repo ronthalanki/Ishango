@@ -1,7 +1,7 @@
 package ishango;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-import ishango.models.Candidate;
+import ishango.models.Choice;
 import ishango.models.User;
 import ishango.models.Vote;
 import java.io.FileInputStream;
@@ -37,19 +37,19 @@ public class DbClient {
     return ds;
   }
 
-  public Candidate getCandidateById(final Integer id) throws SQLException {
-    final String query = String.format("SELECT * FROM Candidates WHERE Id = %s;", id);
+  public Choice getChoiceById(final Integer id) throws SQLException {
+    final String query = String.format("SELECT * FROM Choices WHERE Id = %s;", id);
     final ResultSet resultSet = getResultSet(query);
 
     if (resultSet.next()) {
-      return candidateFromResultSet(resultSet);
+      return choiceFromResultSet(resultSet);
     }
     return null;
   }
 
   public List<Vote> getVotesByUser(final Integer userId) throws SQLException {
     final String query =
-        String.format("SELECT UserId, CandidateId, Rank FROM Votes WHERE UserId = %s;", userId);
+        String.format("SELECT UserId, ChoiceId, Rank FROM Votes WHERE UserId = %s;", userId);
     final ResultSet resultSet = getResultSet(query);
 
     final List<Vote> votes = new ArrayList<>();
@@ -59,15 +59,15 @@ public class DbClient {
     return votes;
   }
 
-  public List<Candidate> listCandidates() throws SQLException {
-    final String query = "SELECT * FROM Candidates;";
+  public List<Choice> listChoices() throws SQLException {
+    final String query = "SELECT * FROM Choices;";
     final ResultSet resultSet = getResultSet(query);
 
-    final List<Candidate> candidates = new ArrayList<>();
+    final List<Choice> choices = new ArrayList<>();
     while (resultSet.next()) {
-      candidates.add(candidateFromResultSet(resultSet));
+      choices.add(choiceFromResultSet(resultSet));
     }
-    return candidates;
+    return choices;
   }
 
   public List<User> listUsers() throws SQLException {
@@ -98,34 +98,15 @@ public class DbClient {
     return pst.getResultSet();
   }
 
-  private Candidate candidateFromResultSet(final ResultSet resultSet) throws SQLException {
-    final Candidate candidate = new Candidate(resultSet.getInt(1), resultSet.getString(2));
-    return candidate;
+  private Choice choiceFromResultSet(final ResultSet resultSet) throws SQLException {
+    return new Choice(resultSet.getInt(1), resultSet.getString(2));
   }
 
   private User userFromResultSet(final ResultSet resultSet) throws SQLException {
-    final User user = new User(resultSet.getInt(1), resultSet.getString(2));
-    return user;
+    return new User(resultSet.getInt(1), resultSet.getString(2));
   }
 
   private Vote voteFromResultSet(final ResultSet resultSet) throws SQLException {
-    final Vote vote = new Vote(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3));
-    return vote;
-  }
-
-  private void executeMultipleQueries(final String query) throws SQLException {
-    PreparedStatement pst = connection.prepareStatement(query);
-    boolean isResult = pst.execute();
-
-    while (isResult) {
-      final ResultSet rs = pst.getResultSet();
-
-      while (rs.next()) {
-        System.out.print("ID: " + rs.getInt(1) + "\t");
-        System.out.println("Name: " + rs.getString(2));
-      }
-
-      isResult = pst.getMoreResults();
-    }
+    return new Vote(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3));
   }
 }

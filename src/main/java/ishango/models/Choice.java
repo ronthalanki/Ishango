@@ -8,7 +8,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class Candidate {
+public class Choice {
   @Getter private final Integer id;
   @Getter private final String name;
 }
