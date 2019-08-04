@@ -8,7 +8,7 @@ import lombok.Getter;
 public class Ballot {
   @Getter private final List<Integer> ballot;
 
-  public Ballot(List<Vote> votes) {
+  public Ballot(final List<Vote> votes) {
     this.ballot = votesToBallot(votes);
   }
 

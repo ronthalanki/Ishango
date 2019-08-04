@@ -23,7 +23,9 @@ public class IshangoClient {
     final List<Choice> choices = dbClient.listChoices();
 
     final List<Ballot> ballots = getBallots(users);
-    final Map<Integer, Integer> votesPerChoice = getVotesPerChoice(choices, ballots);
+    final List<Integer> excludedChoices = new ArrayList<>();
+    final Map<Integer, Integer> votesPerChoice =
+        getVotesPerChoice(choices, ballots, excludedChoices);
 
     final Integer key =
         Collections.max(votesPerChoice.entrySet(), Map.Entry.comparingByValue()).getKey();
@@ -39,7 +41,7 @@ public class IshangoClient {
   }
 
   private Map<Integer, Integer> getVotesPerChoice(
-      final List<Choice> choices, final List<Ballot> ballots) {
+      final List<Choice> choices, final List<Ballot> ballots, final List<Integer> excludedChoices) {
     final Map<Integer, Integer> votesPerChoice = new HashMap<>();
     for (Choice choice : choices) {
       votesPerChoice.put(choice.getId(), 0);
@@ -54,6 +56,7 @@ public class IshangoClient {
 
   public static void main(String[] args) throws IOException, SQLException {
     IshangoClient client = new IshangoClient();
-    System.out.println(client.calculateWinner());
+    client.dbClient.addUser("Bar");
+    client.dbClient.addVote(1, 1, 1);
   }
 }

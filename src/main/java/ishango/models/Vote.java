@@ -10,6 +10,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class Vote {
+  @Getter private final Integer id;
   @Getter private final Integer userId;
   @Getter private final Integer choiceId;
   @Getter private final Integer rank;
