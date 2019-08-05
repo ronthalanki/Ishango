@@ -1,6 +1,7 @@
 package ishango;
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import ishango.models.Ballot;
 import ishango.models.Choice;
 import ishango.models.User;
 import ishango.models.Vote;
@@ -12,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class DbClient {
@@ -108,6 +110,33 @@ public class DbClient {
       votes.add(voteFromResultSet(resultSet));
     }
     return votes;
+  }
+
+  public void setupTables() throws SQLException {
+    executeSql("DROP TABLE IF EXISTS Votes, Users, Choices;");
+    executeSql("CREATE TABLE Choices(Id BIGINT PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(100));");
+    executeSql("CREATE TABLE Users(Id BIGINT PRIMARY KEY AUTO_INCREMENT, Name VARCHAR(100));");
+    executeSql(
+        "CREATE TABLE Votes(Id BIGINT PRIMARY KEY AUTO_INCREMENT, UserId BIGINT, FOREIGN "
+            + "KEY(UserId) REFERENCES Users(Id) ON DELETE CASCADE, ChoiceId BIGINT, Rank BIGINT, "
+            + "FOREIGN KEY(ChoiceId) REFERENCES Choices(Id) ON DELETE CASCADE);");
+  }
+
+  public void fillTables(final List<String> choices, final List<String> users, final Map<Integer, Ballot> ballots) throws SQLException {
+    for (String choice: choices) {
+      addChoice(choice);
+    }
+
+    for (String user: users) {
+      addUser(user);
+    }
+
+    for (Integer user: ballots.keySet()) {
+      final List<Integer> ballot = ballots.get(user).getBallot();
+      for (int i = 0; i < ballot.size(); i++) {
+        addVote(user, ballot.get(i), i + 1);
+      }
+    }
   }
 
   private void executeSql(final String query) throws SQLException {

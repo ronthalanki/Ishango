@@ -1,10 +1,13 @@
 package ishango.models;
 
+import lombok.Getter;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Ballot {
+  @Getter
   private final List<Integer> ballot;
 
   public Ballot(final List<Vote> votes) {

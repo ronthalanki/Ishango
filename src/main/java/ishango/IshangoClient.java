@@ -6,7 +6,6 @@ import ishango.models.User;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +23,44 @@ public class IshangoClient {
 
     final List<Ballot> ballots = getBallots(users);
     final List<Integer> excludedChoices = new ArrayList<>();
-    final Map<Integer, Integer> votesPerChoice =
-        getVotesPerChoice(choices, ballots, excludedChoices);
 
-    final Integer key =
-        Collections.max(votesPerChoice.entrySet(), Map.Entry.comparingByValue()).getKey();
-    return dbClient.getChoiceById(key);
+    while (true) {
+      final Map<Integer, Integer> votesPerChoice =
+          getVotesPerChoice(choices, ballots, excludedChoices);
+
+      Integer maxKey = null;
+      Integer maxVotes = 0;
+      Boolean maxTie = false;
+
+      Integer minKey = null;
+      Integer minVotes = Integer.MAX_VALUE;
+      Boolean minTie = false;
+
+      for (Integer choice : votesPerChoice.keySet()) {
+        final Integer numVotes = votesPerChoice.get(choice);
+        if (numVotes > maxVotes) {
+          maxKey = choice;
+          maxVotes = numVotes;
+          maxTie = false;
+        } else if (numVotes == maxVotes) {
+          maxTie = true;
+        }
+
+        if (numVotes < minVotes) {
+          minKey = choice;
+          minVotes = numVotes;
+          minTie = false;
+        } else if (numVotes == minVotes) {
+          minTie = true;
+        }
+      }
+
+      if (maxTie) {
+        excludedChoices.add(maxKey);
+      } else {
+        return dbClient.getChoiceById(maxKey);
+      }
+    }
   }
 
   private List<Ballot> getBallots(final List<User> users) throws SQLException {
@@ -58,6 +89,6 @@ public class IshangoClient {
 
   public static void main(String[] args) throws Exception {
     IshangoClient client = new IshangoClient();
-    System.out.println(client.calculateWinner());
+    client.dbClient.setupTables();
   }
 }
