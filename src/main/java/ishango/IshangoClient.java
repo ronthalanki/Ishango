@@ -65,7 +65,7 @@ public class IshangoClient {
 
   private List<Ballot> getBallots(final List<User> users) throws SQLException {
     final List<Ballot> ballots = new ArrayList<>();
-    for (User user : users) {
+    for (final User user : users) {
       ballots.add(new Ballot(dbClient.getVotesByUser(user.getId())));
     }
     return ballots;
@@ -75,20 +75,15 @@ public class IshangoClient {
       final List<Choice> choices, final List<Ballot> ballots, final List<Integer> excludedChoices)
       throws Exception {
     final Map<Integer, Integer> votesPerChoice = new HashMap<>();
-    for (Choice choice : choices) {
+    for (final Choice choice : choices) {
       votesPerChoice.put(choice.getId(), 0);
     }
 
-    for (Ballot ballot : ballots) {
+    for (final Ballot ballot : ballots) {
       votesPerChoice.put(
           ballot.getHighestChoice(excludedChoices),
           votesPerChoice.get(ballot.getHighestChoice(excludedChoices)) + 1);
     }
     return votesPerChoice;
-  }
-
-  public static void main(String[] args) throws Exception {
-    IshangoClient client = new IshangoClient();
-    client.dbClient.setupTables();
   }
 }

@@ -122,16 +122,18 @@ public class DbClient {
             + "FOREIGN KEY(ChoiceId) REFERENCES Choices(Id) ON DELETE CASCADE);");
   }
 
-  public void fillTables(final List<String> choices, final List<String> users, final Map<Integer, Ballot> ballots) throws SQLException {
-    for (String choice: choices) {
+  public void fillTables(
+      final List<String> choices, final List<String> users, final Map<Integer, Ballot> ballots)
+      throws SQLException {
+    for (final String choice : choices) {
       addChoice(choice);
     }
 
-    for (String user: users) {
+    for (final String user : users) {
       addUser(user);
     }
 
-    for (Integer user: ballots.keySet()) {
+    for (final Integer user : ballots.keySet()) {
       final List<Integer> ballot = ballots.get(user).getBallot();
       for (int i = 0; i < ballot.size(); i++) {
         addVote(user, ballot.get(i), i + 1);
