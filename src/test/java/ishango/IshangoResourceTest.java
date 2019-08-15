@@ -15,9 +15,9 @@ import ishango.models.Vote;
 import java.util.List;
 import org.junit.Test;
 
-public class IshangoClientTest {
+public class IshangoResourceTest {
   private static final DbClient dbClient = mock(DbClient.class);
-  private static final IshangoClient client = new IshangoClient(dbClient);
+  private static final IshangoResource ishango = new IshangoResource(dbClient);
 
   @Test
   public void testCalculateWinner_oneChoice_allVotes() throws Exception {
@@ -32,7 +32,7 @@ public class IshangoClientTest {
       when(dbClient.getVotesByUser(user.getId())).thenReturn(votes);
     }
 
-    assertThat(client.calculateWinner()).isEqualTo(choice);
+    assertThat(ishango.calculateWinner()).isEqualTo(choice);
   }
 
   @Test
@@ -51,7 +51,7 @@ public class IshangoClientTest {
       when(dbClient.getVotesByUser(user.getId())).thenReturn(votes);
     }
 
-    assertThat(client.calculateWinner()).isEqualTo(choices.get(0));
+    assertThat(ishango.calculateWinner()).isEqualTo(choices.get(0));
   }
 
   @Test
@@ -78,7 +78,7 @@ public class IshangoClientTest {
       when(dbClient.getVotesByUser(users.get(i).getId())).thenReturn(votes);
     }
 
-    assertThat(client.calculateWinner()).isEqualTo(choices.get(1));
+    assertThat(ishango.calculateWinner()).isEqualTo(choices.get(1));
   }
 
   @Test
@@ -113,6 +113,6 @@ public class IshangoClientTest {
             new Vote(newInt(), users.get(4).getId(), choices.get(1).getId(), 3));
     when(dbClient.getVotesByUser(users.get(4).getId())).thenReturn(votes);
 
-    assertThat(client.calculateWinner()).isEqualTo(choices.get(0));
+    assertThat(ishango.calculateWinner()).isEqualTo(choices.get(0));
   }
 }

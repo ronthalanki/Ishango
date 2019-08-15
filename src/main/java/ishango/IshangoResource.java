@@ -11,14 +11,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IshangoClient {
+public class IshangoResource {
   private final DbClient dbClient;
 
-  public IshangoClient() throws IOException, SQLException {
+  public IshangoResource() throws IOException, SQLException {
     this(new DbClient());
   }
 
-  IshangoClient(final DbClient dbClient) {
+  IshangoResource(final DbClient dbClient) {
     this.dbClient = dbClient;
   }
 
