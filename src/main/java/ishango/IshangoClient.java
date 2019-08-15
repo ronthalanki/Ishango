@@ -34,7 +34,7 @@ public class IshangoClient {
     return dbClient.listUsers();
   }
 
-  public void addVote(final Integer userId, final Ballot ballot) throws SQLException {
+  public void addVotes(final Integer userId, final Ballot ballot) throws SQLException {
     final List<Integer> ballotList = ballot.getBallot();
     for (int i = 0; i < ballotList.size(); i++) {
       dbClient.addVote(userId, ballotList.get(i), i + 1);
