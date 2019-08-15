@@ -15,7 +15,11 @@ public class IshangoClient {
   private final DbClient dbClient;
 
   public IshangoClient() throws IOException, SQLException {
-    this.dbClient = new DbClient();
+    this(new DbClient());
+  }
+
+  IshangoClient(final DbClient dbClient) {
+    this.dbClient = dbClient;
   }
 
   public void addChoice(final String choiceName) throws SQLException {
@@ -79,7 +83,7 @@ public class IshangoClient {
         }
       }
 
-      if (maxKey > users.size() / 2) {
+      if (maxVotes > users.size() / 2) {
         return dbClient.getChoiceById(maxKey);
       } else {
         excludedChoices.add(minKey);
