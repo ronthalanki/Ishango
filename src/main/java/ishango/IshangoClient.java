@@ -58,7 +58,6 @@ public class IshangoClient {
 
       Integer maxKey = null;
       Integer maxVotes = 0;
-      Boolean maxTie = false;
 
       Integer minKey = null;
       Integer minVotes = Integer.MAX_VALUE;
@@ -69,9 +68,6 @@ public class IshangoClient {
         if (numVotes > maxVotes) {
           maxKey = choice;
           maxVotes = numVotes;
-          maxTie = false;
-        } else if (numVotes == maxVotes) {
-          maxTie = true;
         }
 
         if (numVotes < minVotes) {
@@ -83,7 +79,7 @@ public class IshangoClient {
         }
       }
 
-      if (maxTie) {
+      if (maxKey > users.size() / 2) {
         excludedChoices.add(maxKey);
       } else {
         return dbClient.getChoiceById(maxKey);
