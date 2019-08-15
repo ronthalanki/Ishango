@@ -3,6 +3,7 @@ package ishango;
 import ishango.models.Ballot;
 import ishango.models.Choice;
 import ishango.models.User;
+import ishango.models.Vote;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,6 +16,33 @@ public class IshangoClient {
 
   public IshangoClient() throws IOException, SQLException {
     this.dbClient = new DbClient();
+  }
+
+  public void addChoice(final String choiceName) throws SQLException {
+    dbClient.addChoice(choiceName);
+  }
+
+  public List<Choice> listChoices() throws SQLException {
+    return dbClient.listChoices();
+  }
+
+  public void addUser(final String userName) throws SQLException {
+    dbClient.addUser(userName);
+  }
+
+  public List<User> listUsers() throws SQLException {
+    return dbClient.listUsers();
+  }
+
+  public void addVote(final Integer userId, final Ballot ballot) throws SQLException {
+    final List<Integer> ballotList = ballot.getBallot();
+    for (int i = 0; i < ballotList.size(); i++) {
+      dbClient.addVote(userId, ballotList.get(i), i + 1);
+    }
+  }
+
+  public List<Vote> listVotes() throws SQLException {
+    return dbClient.listVotes();
   }
 
   public Choice calculateWinner() throws Exception {
