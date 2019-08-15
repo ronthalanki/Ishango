@@ -80,9 +80,9 @@ public class IshangoClient {
       }
 
       if (maxKey > users.size() / 2) {
-        excludedChoices.add(maxKey);
-      } else {
         return dbClient.getChoiceById(maxKey);
+      } else {
+        excludedChoices.add(minKey);
       }
     }
   }
